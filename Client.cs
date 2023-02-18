@@ -33,7 +33,26 @@ namespace iTruck
                 }
             }
             con.Close();
+
+
+            //loadImage();
         }
+
+        /*
+        private void loadImage()
+        {
+            con.Open();
+            NpgsqlCommand cmd = new NpgsqlCommand("select image from услуги where Ид_услуги = 1", con);
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+
+                }
+            }
+             con.Close();
+        }
+        */
 
         private void Client_FormClosed(object sender, FormClosedEventArgs e)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -148,6 +149,33 @@ namespace iTruck
             {
                 MessageBox.Show(ex.Message, "Ошибка печати", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+
+
+
+
+        private void отправитьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            genImage();
+            SendMail sm = new SendMail();
+            sm.ShowDialog();
+        }
+
+
+        private void genImage()
+        {
+            Bitmap result = new Bitmap(dataGridView1.Size.Width + 10, dataGridView1.Size.Height + 30);
+            Graphics g = Graphics.FromImage((Image)result);
+            g.Clear(Color.White);
+            dataGridView1.DrawToBitmap(result, dataGridView1.Bounds);
+            g.DrawImage(result, 0, 0);
+            g.DrawString(sel_tab,
+                         new Font("Arial", 12),
+                         Brushes.Black,
+                         new PointF((dataGridView1.Size.Width + 10) / 2, 5));
+
+            result.Save("mail.jpeg", System.Drawing.Imaging.ImageFormat.Jpeg);
         }
     }
 }

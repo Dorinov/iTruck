@@ -127,6 +127,12 @@
     <Compile Include="Reg.Designer.cs">
       <DependentUpon>Reg.cs</DependentUpon>
     </Compile>
+    <Compile Include="SendMail.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SendMail.Designer.cs">
+      <DependentUpon>SendMail.cs</DependentUpon>
+    </Compile>
     <Compile Include="Sotrudnik.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -156,6 +162,9 @@
     </Compile>
     <EmbeddedResource Include="Reg.resx">
       <DependentUpon>Reg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SendMail.resx">
+      <DependentUpon>SendMail.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Sotrudnik.resx">
       <DependentUpon>Sotrudnik.cs</DependentUpon>

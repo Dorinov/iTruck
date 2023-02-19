@@ -75,7 +75,7 @@ namespace iTruck
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //GetData(dataAdapter.SelectCommand.CommandText);
+            //GetData(dataAdapter.SelectCommand.CommandText); //
             GetData($"select * from {sel_tab} order by {firstColumnName}");
         }
 

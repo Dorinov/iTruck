@@ -13,7 +13,7 @@ namespace iTruck
 {
     public partial class Form1 : Form
     {
-        static string con_string = "Host=localhost:5432;Username=postgres;Password=65adf4gs65d4fb4s6dfg4;Database=gruzoperevozki";
+        public static string con_string = DataSafe.con_string;
         NpgsqlConnection con = new NpgsqlConnection(con_string);
 
         Timer timer = new Timer();

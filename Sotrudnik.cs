@@ -25,7 +25,7 @@ namespace iTruck
         string[] ids = new string[5] { "Ид_должности", "Ид_сотрудника", "Ид_клиента", "Ид_заказа", "Ид_услуги" };
         int sel_tab = 0;
 
-        static string con_string = "Host=localhost:5432;Username=postgres;Password=65adf4gs65d4fb4s6dfg4;Database=gruzoperevozki";
+        static string con_string = DataSafe.con_string;
         NpgsqlConnection con = new NpgsqlConnection(con_string);
 
         public Sotrudnik(Form1 f)
@@ -91,6 +91,7 @@ namespace iTruck
 
             if (arg != 0)
             {
+                button_dataViewer.Enabled = true;
                 int maxId = 0;
                 con.Open();
                 NpgsqlCommand cmd1 = new NpgsqlCommand($"select {ids[arg-1]} from {names[arg-1]}", con);
@@ -338,6 +339,8 @@ namespace iTruck
                     button_add.Enabled = true;
                     button_delete.Enabled = true;
 
+                    button_dataViewer.Enabled = true;
+
                     button_dolzh.Enabled = true;
                     button_sotr.Enabled = true;
                     button_client.Enabled = true;
@@ -364,6 +367,8 @@ namespace iTruck
                 numericUpDown1.Enabled = false;
                 button_add.Enabled = false;
                 button_delete.Enabled = false;
+
+                button_dataViewer.Enabled = false;
 
                 button_dolzh.Enabled = false;
                 button_sotr.Enabled = false;
@@ -480,6 +485,8 @@ namespace iTruck
                     button_edit.Enabled = true;
                     button_delete.Enabled = true;
 
+                    button_dataViewer.Enabled = true;
+
                     button_dolzh.Enabled = true;
                     button_sotr.Enabled = true;
                     button_client.Enabled = true;
@@ -505,6 +512,8 @@ namespace iTruck
                 numericUpDown1.Enabled = false;
                 button_edit.Enabled = false;
                 button_delete.Enabled = false;
+
+                button_dataViewer.Enabled = false;
 
                 button_dolzh.Enabled = false;
                 button_sotr.Enabled = false;
@@ -606,6 +615,8 @@ namespace iTruck
                 button_add.Enabled = true;
                 button_delete.Enabled = true;
 
+                button_dataViewer.Enabled = true;
+
                 button_dolzh.Enabled = true;
                 button_sotr.Enabled = true;
                 button_client.Enabled = true;
@@ -619,6 +630,16 @@ namespace iTruck
                 button_edit.Text = "Редактировать";
                 edit_mode = false;
             }
+        }
+
+        private void button_dataViewer_Click(object sender, EventArgs e)
+        {
+            dataViewer dv = new dataViewer();
+            dv.sel_tab = names[sel_tab - 1];
+            dv.firstColumnName = ids[sel_tab - 1];
+            dv.id_dolzh = id_d;
+            dv.ShowDialog();
+
         }
     }
 }

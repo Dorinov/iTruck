@@ -15,7 +15,7 @@ namespace iTruck
     {
         Form1 f1;
 
-        static string con_string = "Host=localhost:5432;Username=postgres;Password=65adf4gs65d4fb4s6dfg4;Database=gruzoperevozki";
+        static string con_string = DataSafe.con_string;
         NpgsqlConnection con = new NpgsqlConnection(con_string);
 
         public Client(Form1 f)
@@ -61,7 +61,7 @@ namespace iTruck
 
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

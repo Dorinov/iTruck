@@ -268,7 +268,14 @@ namespace iTruck
                     {
                         while (reader.Read())
                         {
-                            numericUpDown2.Value = reader.GetInt32(1);
+                            if (reader.GetValue(1).ToString() != "")
+                            {
+                                numericUpDown2.Value = reader.GetInt32(1);
+                            }
+                            else
+                            {
+                                numericUpDown2.Value = 0;
+                            }
                             numericUpDown3.Value = reader.GetInt32(2);
                             numericUpDown4.Value = reader.GetInt32(3);
                             textBox1.Text = reader.GetString(4);

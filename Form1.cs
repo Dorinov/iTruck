@@ -186,7 +186,14 @@ namespace iTruck
 
         private void LogIn_Click(object sender, EventArgs e)
         {
-            tryLogin();
+            try
+            {
+                tryLogin();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка входа", MessageBoxButtons.OK);
+            }
         }
 
         private void LogUp_Click(object sender, EventArgs e)
@@ -208,7 +215,14 @@ namespace iTruck
         {
             if (e.KeyCode == Keys.Enter)
             {
-                tryLogin();
+                try
+                {
+                    tryLogin();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка входа", MessageBoxButtons.OK);
+                }
             }
         }
 

@@ -50,7 +50,7 @@ namespace iTruck
                     client.Send(msg);
                     image.Dispose();
                     File.Delete("mail.jpeg");
-                    if (MessageBox.Show("Удачно!", "Отправка таблицы", MessageBoxButtons.OK) == DialogResult.OK)
+                    if (MessageBox.Show("Сообщение отправлено!", "Отправка таблицы", MessageBoxButtons.OK) == DialogResult.OK)
                     {
                         Close();
                     }

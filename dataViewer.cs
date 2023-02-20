@@ -19,6 +19,8 @@ namespace iTruck
         public string firstColumnName;
         public int id_dolzh;
 
+        bool editRows = false;
+
         private BindingSource bindingSource1 = new BindingSource();
         private NpgsqlDataAdapter dataAdapter = new NpgsqlDataAdapter();
 
@@ -47,6 +49,11 @@ namespace iTruck
                     dataGridView1.ReadOnly = false;
                     button2.Enabled = true;
                     button3.Enabled = true;
+                    editRows = true;
+                    break;
+                case 2:
+                    dataGridView1.ReadOnly = false;
+                    button2.Enabled = true;
                     break;
                 default:
                     break;
@@ -176,6 +183,12 @@ namespace iTruck
                          new PointF((dataGridView1.Size.Width + 10) / 2, 5));
 
             result.Save("mail.jpeg", System.Drawing.Imaging.ImageFormat.Jpeg);
+        }
+
+        private void dataGridView1_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            if (!editRows)
+                ((DataGridView)sender).CancelEdit();
         }
     }
 }

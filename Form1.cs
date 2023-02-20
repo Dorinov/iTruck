@@ -51,145 +51,107 @@ namespace iTruck
             timer.Start();
         }
 
+        private int checkLoginPassword(string id_c_name, string table_name)
+        {
+            int p_accept = 0;
+            int id = 0;
+            con.Open();
+            NpgsqlCommand cmd = new NpgsqlCommand($"select {id_c_name}, номер_телефона from {table_name}", con);
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    string login = reader.GetString(1);
+                    if (login == tb_login.Text)
+                    {
+                        id = reader.GetInt32(0);
+                        break;
+                    }
+                }
+            }
+            if (id != 0)
+            {
+                NpgsqlCommand cmd1 = new NpgsqlCommand($"select пароль from {table_name} where {id_c_name} = " + id, con);
+                var reader = cmd1.ExecuteReader();
+                if (reader.Read())
+                {
+                    string pass = reader.GetString(0);
+                    if (pass == tb_password.Text)
+                    {
+                        tb_login.Text = "";
+                        tb_password.Text = "";
+                        try_counter = 0;
+                        acc_id = id;
+                        p_accept = 2;
+                    }
+                    else
+                    {
+                        p_accept = 1;
+                    }
+                }
+                reader.Close();
+            }
+            con.Close();
+            return p_accept;
+        }
+
         private void tryLogin()
         {
             if (tb_login.Text != "" && tb_password.Text != "")
             {
                 try_counter++;
 
-                string id = "";
-                string t_login = tb_login.Text;
-                string t_pass = tb_password.Text;
-
-                con.Open();
-                NpgsqlCommand cmd = new NpgsqlCommand("select Ид_сотрудника, номер_телефона from сотрудник", con);
-                using (var reader = cmd.ExecuteReader())
+                int s = checkLoginPassword("Ид_сотрудника", "сотрудник");
+                if (s == 0)
                 {
-                    while (reader.Read())
+                    int c = checkLoginPassword("Ид_клиента", "клиент");
+                    if (c == 0)
                     {
-                        string login = reader["номер_телефона"].ToString();
-                        if (login == t_login)
-                        {
-                            id = reader["Ид_сотрудника"].ToString();
-                            break;
-                        }
-                    }
-                }
-
-                if (id != "")
-                {
-                    bool p_accept = false;
-                    NpgsqlCommand cmd1 = new NpgsqlCommand("select пароль from сотрудник where Ид_сотрудника = " + id, con);
-                    using (var reader = cmd1.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            string pass = reader["пароль"].ToString();
-                            if (pass == t_pass)
-                            {
-                                acc_id = Convert.ToInt32(id);
-                                Sotrudnik sotr = new Sotrudnik(this);
-                                tb_login.Text = "";
-                                tb_password.Text = "";
-                                sotr.Show();
-                                try_counter = 0;
-                                this.Hide();
-                                p_accept = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!p_accept)
-                    {
-                        if (try_counter == 3)
-                        {
-                            try_counter = 0;
-                            Captcha ct = new Captcha(this);
-                            ct.ShowDialog();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Неправильный пароль.", "Ошибка входа", MessageBoxButtons.OK);
-                        }
-                    }
-                }
-                else
-                {
-                    NpgsqlCommand cmd1 = new NpgsqlCommand("select Ид_клиента, номер_телефона from клиент", con);
-                    using (var reader = cmd1.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            string login = reader["номер_телефона"].ToString();
-                            if (login == t_login)
-                            {
-                                id = reader["Ид_клиента"].ToString();
-                                break;
-                            }
-                        }
-                    }
-
-                    if (id != "")
-                    {
-                        bool p_accept = false;
-                        NpgsqlCommand cmd2 = new NpgsqlCommand("select пароль from клиент where Ид_клиента = " + id, con);
-                        using (var reader = cmd2.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                string pass = reader["пароль"].ToString();
-                                if (pass == t_pass)
-                                {
-                                    acc_id = Convert.ToInt32(id);
-                                    Client cl = new Client(this);
-                                    tb_login.Text = "";
-                                    tb_password.Text = "";
-                                    cl.Show();
-                                    try_counter = 0;
-                                    this.Hide();
-                                    p_accept = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (!p_accept)
-                        {
-                            if (try_counter == 3)
-                            {
-                                try_counter = 0;
-                                Captcha ct = new Captcha(this);
-                                ct.ShowDialog();
-                            }
-                            else
-                            {
-                                MessageBox.Show("Неправильный пароль.", "Ошибка входа", MessageBoxButtons.OK);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (try_counter == 3)
-                        {
-                            try_counter = 0;
-                            Captcha ct = new Captcha(this);
-                            ct.ShowDialog();
-                        }
-                        else
-                        {
+                        if (!checkTryCounter())
                             MessageBox.Show("Аккаунт не существует.", "Ошибка входа", MessageBoxButtons.OK);
-                        }
+                    }
+                    else if (c == 1)
+                    {
+                        if (!checkTryCounter())
+                            MessageBox.Show("Неправильный пароль.", "Ошибка входа", MessageBoxButtons.OK);
+                    }
+                    else if (c == 2)
+                    {
+                        Client cl = new Client(this);
+                        cl.Show();
+                        this.Hide();
                     }
                 }
-                con.Close();
+                else if (s == 1)
+                {
+                    if (!checkTryCounter())
+                        MessageBox.Show("Неправильный пароль.", "Ошибка входа", MessageBoxButtons.OK);
+                }
+                else if (s == 2)
+                {
+                    Sotrudnik sotr = new Sotrudnik(this);
+                    sotr.Show();
+                    this.Hide();
+                }
             }
+        }
+
+        private bool checkTryCounter()
+        {
+            bool limit = false;
+            if (try_counter == 3)
+            {
+                limit = true;
+                try_counter = 0;
+                Captcha ct = new Captcha(this);
+                ct.ShowDialog();
+            }
+            return limit;
         }
 
         private void LogIn_Click(object sender, EventArgs e)
         {
-            try
-            {
-                tryLogin();
-            }
+            try { tryLogin(); }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка входа", MessageBoxButtons.OK);
@@ -206,19 +168,14 @@ namespace iTruck
         private void tb_login_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-            {
                 tb_password.Focus();
-            }
         }
 
         private void tb_password_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                try
-                {
-                    tryLogin();
-                }
+                try { tryLogin(); }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Ошибка входа", MessageBoxButtons.OK);

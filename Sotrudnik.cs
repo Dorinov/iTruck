@@ -54,9 +54,6 @@ namespace iTruck
             f1.Show();
         }
 
-
-
-
         private void changePanel(int arg, int val = 1)
         {
             sel_tab = arg;
@@ -91,6 +88,7 @@ namespace iTruck
 
             if (arg != 0)
             {
+                label3.Text = $"Данные ({names[arg - 1]})";
                 button_dataViewer.Enabled = true;
                 int maxId = 0;
                 con.Open();
@@ -99,7 +97,7 @@ namespace iTruck
                 {
                     while (reader.Read())
                     {
-                        maxId = Convert.ToInt32(reader[$"{ids[arg-1]}"]);
+                        maxId = reader.GetInt32(0);
                     }
                 }
                 con.Close();
@@ -115,12 +113,11 @@ namespace iTruck
                     button_delete.Enabled = true;
                 }
                 else if (id_d == 2)
-                {
                     button_add.Enabled = true;
-                }
             }
             else
             {
+                label3.Text = "Данные";
                 numericUpDown1.Enabled = false;
                 button_edit.Enabled = false;
                 button_add.Enabled = false;
@@ -128,59 +125,30 @@ namespace iTruck
             }
         }
 
-
-
         private void button_dolzh_Click(object sender, EventArgs e)
         {
             changePanel(1);
-            button_dolzh.BackColor = SystemColors.Control;
-            button_sotr.BackColor = SystemColors.ControlLight;
-            button_client.BackColor = SystemColors.ControlLight;
-            button_zakaz.BackColor = SystemColors.ControlLight;
-            button_usl.BackColor = SystemColors.ControlLight;
         }
 
         private void button_sotr_Click(object sender, EventArgs e)
         {
             changePanel(2);
-            button_dolzh.BackColor = SystemColors.ControlLight;
-            button_sotr.BackColor = SystemColors.Control;
-            button_client.BackColor = SystemColors.ControlLight;
-            button_zakaz.BackColor = SystemColors.ControlLight;
-            button_usl.BackColor = SystemColors.ControlLight;
         }
 
         private void button_client_Click(object sender, EventArgs e)
         {
             changePanel(3);
-            button_dolzh.BackColor = SystemColors.ControlLight;
-            button_sotr.BackColor = SystemColors.ControlLight;
-            button_client.BackColor = SystemColors.Control;
-            button_zakaz.BackColor = SystemColors.ControlLight;
-            button_usl.BackColor = SystemColors.ControlLight;
         }
 
         private void button_zakaz_Click(object sender, EventArgs e)
         {
             changePanel(4);
-            button_dolzh.BackColor = SystemColors.ControlLight;
-            button_sotr.BackColor = SystemColors.ControlLight;
-            button_client.BackColor = SystemColors.ControlLight;
-            button_zakaz.BackColor = SystemColors.Control;
-            button_usl.BackColor = SystemColors.ControlLight;
         }
 
         private void button_usl_Click(object sender, EventArgs e)
         {
             changePanel(5);
-            button_dolzh.BackColor = SystemColors.ControlLight;
-            button_sotr.BackColor = SystemColors.ControlLight;
-            button_client.BackColor = SystemColors.ControlLight;
-            button_zakaz.BackColor = SystemColors.ControlLight;
-            button_usl.BackColor = SystemColors.Control;
         }
-
-
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
@@ -200,113 +168,75 @@ namespace iTruck
             while (!have)
             {
                 cmd = new NpgsqlCommand($"SELECT EXISTS(select * from {names[sel_tab-1]} where {ids[sel_tab - 1]} = {_id})", con);
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        have = reader.GetBoolean(0);
-                    }
-                }
+                var reader1 = cmd.ExecuteReader();
+                if (reader1.Read())
+                    have = reader1.GetBoolean(0);
+                reader1.Close();
+
                 if (!have)
                 {
                     if (kuda)
-                    {
                         _id++;
-                    }
                     else
-                    {
                         _id--;
-                    }
                 }
             }
 
             NpgsqlCommand cmd1 = new NpgsqlCommand($"select * from {names[sel_tab - 1]} where {ids[sel_tab - 1]} = {_id}", con);
-
-            switch (sel_tab)
+            var reader = cmd1.ExecuteReader();
+            if (reader.Read())
             {
-                case 1:
-                    using (var reader = cmd1.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            textBox4.Text = reader.GetString(1);
-                            textBox5.Text = Convert.ToString(reader.GetInt32(2)) + " RUB";
-                        }
-                    }
-                    break;
-                case 2:
-                    using (var reader = cmd1.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            textBox6.Text = reader.GetString(1);
-                            textBox7.Text = reader.GetString(2);
-                            textBox8.Text = reader.GetString(3);
-                            textBox9.Text = reader.GetString(4);
-                            numericUpDown5.Value = reader.GetInt32(5);
-                            textBox10.Text = reader.GetString(6);
-                            textBox10.PasswordChar = '*';
-                        }
-                    }
-                    break;
-                case 3:
-                    using (var reader = cmd1.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            textBox15.Text = reader.GetString(1);
-                            textBox14.Text = reader.GetString(2);
-                            textBox13.Text = reader.GetString(3);
-                            textBox12.Text = reader.GetString(4);
-                            textBox11.Text = reader.GetString(5);
-                            textBox11.PasswordChar = '*';
-                        }
-                    }
-                    break;
-                case 4:
-                    using (var reader = cmd1.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            if (reader.GetValue(1).ToString() != "")
-                            {
-                                numericUpDown2.Value = reader.GetInt32(1);
-                            }
-                            else
-                            {
-                                numericUpDown2.Value = 0;
-                            }
-                            numericUpDown3.Value = reader.GetInt32(2);
-                            numericUpDown4.Value = reader.GetInt32(3);
-                            textBox1.Text = reader.GetString(4);
-                            textBox2.Text = reader.GetString(5);
-                            string date = Convert.ToString(reader.GetDateTime(6)).Substring(0, 10);
-                            string time = Convert.ToString(reader.GetTimeSpan(7));
-                            dateTimePicker1.Value = DateTime.Parse(date + " " + time);
-                            textBox3.Text = reader.GetString(8);
-                            checkBox1.Checked = reader.GetBoolean(9);
-                        }
-                    }
-                    break;
-                case 5:
-                    using (var reader = cmd1.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            textBox17.Text = Convert.ToString(reader.GetInt32(1)) + " кг";
-                            textBox18.Text = Convert.ToString(reader.GetInt32(2)) + " м3";
-                            textBox16.Text = reader.GetString(3);
-                        }
-                    }
-                    break;
-                default:
-                    break;
+                switch (sel_tab)
+                {
+                    case 1:
+                        textBox4.Text = reader.GetString(1);
+                        textBox5.Text = Convert.ToString(reader.GetInt32(2)) + " RUB";
+                        break;
+                    case 2:
+                        textBox6.Text = reader.GetString(1);
+                        textBox7.Text = reader.GetString(2);
+                        textBox8.Text = reader.GetString(3);
+                        textBox9.Text = reader.GetString(4);
+                        numericUpDown5.Value = reader.GetInt32(5);
+                        textBox10.Text = reader.GetString(6);
+                        textBox10.PasswordChar = '*';
+                        break;
+                    case 3:
+                        textBox15.Text = reader.GetString(1);
+                        textBox14.Text = reader.GetString(2);
+                        textBox13.Text = reader.GetString(3);
+                        textBox12.Text = reader.GetString(4);
+                        textBox11.Text = reader.GetString(5);
+                        textBox11.PasswordChar = '*';
+                        break;
+                    case 4:
+                        if (reader.GetValue(1).ToString() != "")
+                            numericUpDown2.Value = reader.GetInt32(1);
+                        else
+                            numericUpDown2.Value = 0;
+                        numericUpDown3.Value = reader.GetInt32(2);
+                        numericUpDown4.Value = reader.GetInt32(3);
+                        textBox1.Text = reader.GetString(4);
+                        textBox2.Text = reader.GetString(5);
+                        string date = Convert.ToString(reader.GetDateTime(6)).Substring(0, 10);
+                        string time = Convert.ToString(reader.GetTimeSpan(7));
+                        dateTimePicker1.Value = DateTime.Parse(date + " " + time);
+                        textBox3.Text = reader.GetString(8);
+                        checkBox1.Checked = reader.GetBoolean(9);
+                        break;
+                    case 5:
+                        textBox17.Text = Convert.ToString(reader.GetInt32(1)) + " кг";
+                        textBox18.Text = Convert.ToString(reader.GetInt32(2)) + " м3";
+                        textBox16.Text = reader.GetString(3);
+                        break;
+                    default:
+                        break;
+                }
             }
+            reader.Close();
             con.Close();
             numericUpDown1.Value = _id;
         }
-
-
 
         private void button_edit_Click(object sender, EventArgs e)
         {
@@ -341,25 +271,7 @@ namespace iTruck
                     NpgsqlCommand cmd = new NpgsqlCommand(txt, con);
                     cmd.ExecuteNonQuery();
                     con.Close();
-
-                    numericUpDown1.Enabled = true;
-                    button_add.Enabled = true;
-                    button_delete.Enabled = true;
-
-                    button_dataViewer.Enabled = true;
-
-                    button_dolzh.Enabled = true;
-                    button_sotr.Enabled = true;
-                    button_client.Enabled = true;
-                    button_zakaz.Enabled = true;
-                    button_usl.Enabled = true;
-                    button1.Visible = false;
-
-                    unlockPanels(false);
-                    getNewData(Convert.ToInt32(numericUpDown1.Value));
-
-                    button_edit.Text = "Редактировать";
-                    edit_mode = false;
+                    changeButtonsMode(1);
                 }
                 catch (Exception ex)
                 {
@@ -368,24 +280,61 @@ namespace iTruck
                 }
             }
             else
+                changeButtonsMode(4);
+        }
+
+        /*  operationId:
+         *      1 - завершение редактирования
+         *      2 - завершение добавления
+         *      3 - отмена
+         * 
+         *      4 - начало редактирования
+         *      5 - начало добавления */
+        private void changeButtonsMode(int operationId, int maxid = 0)
+        {
+            if (operationId <= 3)
+            {
+                numericUpDown1.Enabled = true;
+                button_add.Enabled = true;
+                button_edit.Enabled = true;
+                button_edit.Text = "Редактировать";
+                button_delete.Enabled = true;
+                button_dataViewer.Enabled = true;
+                unlockPanels(false);
+                getNewData(Convert.ToInt32(numericUpDown1.Value));
+                button_dolzh.Enabled = true;
+                button_sotr.Enabled = true;
+                button_client.Enabled = true;
+                button_zakaz.Enabled = true;
+                button_usl.Enabled = true;
+                button1.Visible = false;
+                edit_mode = false;
+                if (operationId == 2)
+                {
+                    numericUpDown1.Maximum = maxid;
+                    numericUpDown1.Value = maxid;
+                }
+            }
+            else
             {
                 edit_mode = true;
                 button1.Visible = true;
-                numericUpDown1.Enabled = false;
-                button_add.Enabled = false;
-                button_delete.Enabled = false;
-
-                button_dataViewer.Enabled = false;
-
                 button_dolzh.Enabled = false;
                 button_sotr.Enabled = false;
                 button_client.Enabled = false;
                 button_zakaz.Enabled = false;
                 button_usl.Enabled = false;
-
-                button_edit.Text = "Применить";
-
+                button_dataViewer.Enabled = false;
+                numericUpDown1.Enabled = false;
+                button_delete.Enabled = false;
                 unlockPanels(true);
+                if (operationId == 4)
+                {
+                    button_add.Enabled = false;
+                    button_edit.Text = "Применить";
+                }
+                if (operationId == 5)
+                    button_edit.Enabled = false;
             }
         }
 
@@ -450,8 +399,6 @@ namespace iTruck
             }
         }
 
-
-
         private void button_add_Click(object sender, EventArgs e)
         {
             if (edit_mode)
@@ -485,26 +432,7 @@ namespace iTruck
                     NpgsqlCommand cmd = new NpgsqlCommand(txt, con);
                     cmd.ExecuteNonQuery();
                     con.Close();
-
-                    numericUpDown1.Enabled = true;
-                    numericUpDown1.Maximum = maxId;
-                    numericUpDown1.Value = maxId;
-                    button_edit.Enabled = true;
-                    button_delete.Enabled = true;
-
-                    button_dataViewer.Enabled = true;
-
-                    button_dolzh.Enabled = true;
-                    button_sotr.Enabled = true;
-                    button_client.Enabled = true;
-                    button_zakaz.Enabled = true;
-                    button_usl.Enabled = true;
-                    button1.Visible = false;
-
-                    unlockPanels(false);
-                    getNewData(Convert.ToInt32(numericUpDown1.Value));
-
-                    edit_mode = false;
+                    changeButtonsMode(2, maxId);
                 }
                 catch (Exception ex)
                 {
@@ -514,37 +442,14 @@ namespace iTruck
             }
             else
             {
-                edit_mode = true;
-                button1.Visible = true;
-                numericUpDown1.Enabled = false;
-                button_edit.Enabled = false;
-                button_delete.Enabled = false;
-
-                button_dataViewer.Enabled = false;
-
-                button_dolzh.Enabled = false;
-                button_sotr.Enabled = false;
-                button_client.Enabled = false;
-                button_zakaz.Enabled = false;
-                button_usl.Enabled = false;
-
+                changeButtonsMode(5);
                 switch (sel_tab)
                 {
                     case 1:
-                        textBox4.Enabled = true;
-                        textBox5.Enabled = true;
-
                         textBox4.Text = "";
                         textBox5.Text = "";
                         break;
                     case 2:
-                        textBox6.Enabled = true;
-                        textBox7.Enabled = true;
-                        textBox8.Enabled = true;
-                        textBox9.Enabled = true;
-                        numericUpDown5.Enabled = true;
-                        textBox10.Enabled = true;
-
                         textBox6.Text = "";
                         textBox7.Text = "";
                         textBox8.Text = "";
@@ -553,12 +458,6 @@ namespace iTruck
                         textBox10.Text = "";
                         break;
                     case 3:
-                        textBox15.Enabled = true;
-                        textBox14.Enabled = true;
-                        textBox13.Enabled = true;
-                        textBox12.Enabled = true;
-                        textBox11.Enabled = true;
-
                         textBox15.Text = "";
                         textBox14.Text = "";
                         textBox13.Text = "";
@@ -566,25 +465,12 @@ namespace iTruck
                         textBox11.Text = "";
                         break;
                     case 4:
-                        numericUpDown2.Enabled = true;
-                        numericUpDown3.Enabled = true;
-                        numericUpDown4.Enabled = true;
-                        textBox1.Enabled = true;
-                        textBox2.Enabled = true;
-                        dateTimePicker1.Enabled = true;
-                        textBox3.Enabled = true;
-                        checkBox1.Enabled = true;
-
                         textBox1.Text = "";
                         textBox2.Text = "";
                         textBox3.Text = "";
                         checkBox1.Checked = false;
                         break;
                     case 5:
-                        textBox17.Enabled = true;
-                        textBox18.Enabled = true;
-                        textBox16.Enabled = true;
-
                         textBox17.Text = "";
                         textBox18.Text = "";
                         textBox16.Text = "";
@@ -616,27 +502,7 @@ namespace iTruck
         private void button1_Click(object sender, EventArgs e)
         {
             if (edit_mode)
-            {
-                numericUpDown1.Enabled = true;
-                button_edit.Enabled = true;
-                button_add.Enabled = true;
-                button_delete.Enabled = true;
-
-                button_dataViewer.Enabled = true;
-
-                button_dolzh.Enabled = true;
-                button_sotr.Enabled = true;
-                button_client.Enabled = true;
-                button_zakaz.Enabled = true;
-                button_usl.Enabled = true;
-                button1.Visible = false;
-
-                unlockPanels(false);
-                getNewData(Convert.ToInt32(numericUpDown1.Value));
-
-                button_edit.Text = "Редактировать";
-                edit_mode = false;
-            }
+                changeButtonsMode(3);
         }
 
         private void button_dataViewer_Click(object sender, EventArgs e)
@@ -646,7 +512,6 @@ namespace iTruck
             dv.firstColumnName = ids[sel_tab - 1];
             dv.id_dolzh = id_d;
             dv.ShowDialog();
-
         }
     }
 }

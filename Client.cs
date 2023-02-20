@@ -42,33 +42,12 @@ namespace iTruck
             con.Close();
         }
 
-        private void Client_Load(object sender, EventArgs e)
-        {
-            getMaxId();
-        }
-
-
-
-
-
-
-
         private void button1_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Вы действительно хотите выйти из аккаунта?", "Выход", MessageBoxButtons.YesNo)
                 == DialogResult.Yes)
-            {
                 Close();
-            }
         }
-
-        private void Client_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            f1.Show();
-        }
-
-
-
 
         private void setUslugiData(int id)
         {
@@ -83,20 +62,18 @@ namespace iTruck
             }
             con.Close();
         }
+
         private void loadImage(int id)
         {
             con.Open();
             try
             {
                 NpgsqlCommand cmd = new NpgsqlCommand("select image from услуги where Ид_услуги = " + id, con);
-                NpgsqlDataAdapter da = new NpgsqlDataAdapter(cmd);
-                DataSet ds = new DataSet();
-                da.Fill(ds);
                 var reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
                     Byte[] byteBLOBData = new Byte[0];
-                    byteBLOBData = (Byte[])(ds.Tables[0].Rows[0][0]);
+                    byteBLOBData = (Byte[])(reader.GetValue(0));
                     MemoryStream stmBLOBData = new MemoryStream(byteBLOBData);
                     pictureBox1.Image = Image.FromStream(stmBLOBData);
                 }
@@ -117,14 +94,11 @@ namespace iTruck
             NpgsqlCommand cmd1 = new NpgsqlCommand($"select exists(select наименование from услуги where Ид_услуги = {id})", con);
             var reader = cmd1.ExecuteReader();
             if (reader.Read())
-            {
                 exists = reader.GetBoolean(0);
-            }
             con.Close();
 
             return exists;
         }
-
 
         private void getMaxId()
         {
@@ -220,16 +194,13 @@ namespace iTruck
             clearData();
         }
 
-
         private void setUslugaText(int id)
         {
             con.Open();
             NpgsqlCommand cmd = new NpgsqlCommand("select наименование from услуги where Ид_услуги = " + id, con);
             var reader = cmd.ExecuteReader();
             if (reader.Read())
-            {
                 label4.Text = reader.GetString(0) + $" ({id})";
-            }
             con.Close();
         }
 
@@ -277,9 +248,7 @@ namespace iTruck
                 con.Close();
             }
             else
-            {
                 MessageBox.Show("Сначала заполните все обязательные поля!", "Заказ", MessageBoxButtons.OK);
-            }
         }
 
         private void button10_Click(object sender, EventArgs e)
@@ -288,9 +257,7 @@ namespace iTruck
             {
                 selId += -1;
                 if (isRowExists(selId))
-                {
                     setUslugaText(selId);
-                }
             }
         }
 
@@ -300,10 +267,18 @@ namespace iTruck
             {
                 selId += 1;
                 if (isRowExists(selId))
-                {
                     setUslugaText(selId);
-                }
             }
+        }
+
+        private void Client_Load(object sender, EventArgs e)
+        {
+            getMaxId();
+        }
+
+        private void Client_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            f1.Show();
         }
     }
 }

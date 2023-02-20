@@ -51,9 +51,7 @@ namespace iTruck
                     image.Dispose();
                     File.Delete("mail.jpeg");
                     if (MessageBox.Show("Сообщение отправлено!", "Отправка таблицы", MessageBoxButtons.OK) == DialogResult.OK)
-                    {
                         Close();
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -68,42 +66,31 @@ namespace iTruck
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-            {
                 textBox2.Focus();
-            }
         }
 
         private void textBox2_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-            {
                 textBox3.Focus();
-            }
         }
 
         private void textBox3_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-            {
                 textBox4.Focus();
-            }
         }
 
         private void textBox4_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-            {
                 textBox5.Focus();
-            }
         }
 
         private void textBox5_KeyDown(object sender, KeyEventArgs e)
         {
-
             if (e.KeyCode == Keys.Enter)
-            {
                 send();
-            }
         }
     }
 }

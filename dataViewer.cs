@@ -65,13 +65,8 @@ namespace iTruck
             try
             {
                 dataAdapter = new NpgsqlDataAdapter(cmd, con_string);
-
                 NpgsqlCommandBuilder commandBuilder = new NpgsqlCommandBuilder(dataAdapter);
-
-                DataTable table = new DataTable
-                {
-                    Locale = CultureInfo.InvariantCulture
-                };
+                DataTable table = new DataTable { Locale = CultureInfo.InvariantCulture };
                 dataAdapter.Fill(table);
                 bindingSource1.DataSource = table;
             }
@@ -123,17 +118,9 @@ namespace iTruck
             }
         }
 
-
-
-
-
-
         private void печатьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
-            {
-                printDocument1.Print();
-            }
+            try { printDocument1.Print(); }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка печати", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -158,17 +145,12 @@ namespace iTruck
             }
         }
 
-
-
-
-
         private void отправитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
             genImage();
             SendMail sm = new SendMail();
             sm.ShowDialog();
         }
-
 
         private void genImage()
         {

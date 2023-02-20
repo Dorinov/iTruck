@@ -29,68 +29,50 @@ namespace iTruck
             this.Close();
         }
 
+        private bool isLoginAlreadyUsed(string table_name)
+        {
+            bool used = false;
+            NpgsqlCommand cmd = new NpgsqlCommand($"select exists(select пароль from {table_name} where номер_телефона = {tb_login.Text})", con);
+            var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                used = reader.GetBoolean(0);
+            }
+            reader.Close();
+            return used;
+        }
+
+        private int getMaxId()
+        {
+            int id = 0;
+            NpgsqlCommand cmd = new NpgsqlCommand("select Ид_клиента from клиент", con);
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    id = reader.GetInt32(0);
+                }
+            }
+            id++;
+            return id;
+        }
 
         private void tryReg()
         {
             if (tb_login.Text != "" && tb_password.Text != "")
             {
-                string t_login = tb_login.Text;
-                string t_pass = tb_password.Text;
-
-                bool haveAcc = false;
-
                 con.Open();
-                NpgsqlCommand cmd = new NpgsqlCommand("select номер_телефона from сотрудник", con);
-                using (var reader = cmd.ExecuteReader())
+                if (!isLoginAlreadyUsed("сотрудник") && !isLoginAlreadyUsed("клиент"))
                 {
-                    while (reader.Read())
-                    {
-                        string login = reader["номер_телефона"].ToString();
-                        if (login == t_login)
-                        {
-                            haveAcc = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!haveAcc)
-                {
-                    int maxId = 0;
-
-                    NpgsqlCommand cmd1 = new NpgsqlCommand("select Ид_клиента, номер_телефона from клиент", con);
-                    using (var reader = cmd1.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            maxId = Convert.ToInt32(reader["Ид_клиента"]);
-                            string login = reader["номер_телефона"].ToString();
-                            if (login == t_login)
-                            {
-                                haveAcc = true;
-                                break;
-                            }
-                        }
-                    }
-                    maxId++;
-
-                    if (!haveAcc)
-                    {
-                        NpgsqlCommand cmd2 = new NpgsqlCommand($"insert into клиент values({maxId},null,null,null,'{t_login}',null,'{t_pass}')", con);
-                        cmd2.ExecuteNonQuery();
-                        f1.acc_id = maxId;
-                        f1.regComplete();
-                        this.Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Такой аккаунт уже существует.", "Ошибка регистрации", MessageBoxButtons.OK);
-                    }
+                    int id = getMaxId();
+                    NpgsqlCommand cmd = new NpgsqlCommand($"insert into клиент values({id},null,null,null,'{tb_login.Text}',null,'{tb_password.Text}')", con);
+                    cmd.ExecuteNonQuery();
+                    f1.acc_id = id;
+                    f1.regComplete();
+                    this.Close();
                 }
                 else
-                {
                     MessageBox.Show("Такой аккаунт уже существует.", "Ошибка регистрации", MessageBoxButtons.OK);
-                }
                 con.Close();
             }
         }
@@ -98,17 +80,13 @@ namespace iTruck
         private void tb_login_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-            {
                 tb_password.Focus();
-            }
         }
 
         private void tb_password_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-            {
                 tryReg();
-            }
         }
 
         private void LogIn_Click(object sender, EventArgs e)
